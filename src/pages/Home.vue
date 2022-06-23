@@ -4,7 +4,7 @@
 
 <template>
   <div class="warpper">
-    hello world
+    <GanttChart />
   </div>
 </template>
 
