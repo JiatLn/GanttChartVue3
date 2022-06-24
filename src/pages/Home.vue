@@ -1,46 +1,23 @@
 <script setup lang="ts">
-const userList = [
-  {
-    id: 1,
-    Name: '张三',
-  },
-  {
-    id: 2,
-    Name: '李四',
-  },
-  {
-    id: 3,
-    Name: '王五',
-  },
-]
+import { getAfterTime, getRandomDataBetween } from '@/utils/date'
 
-const timeList = [
-  {
-    id: 1,
-    startTime: '2022-07-04 12:00',
-    endTime: '2022-07-06 23:59',
-  },
-  {
-    id: 2,
-    startTime: '2022-07-07 00:00',
-    endTime: '2022-07-08 23:59',
-  },
-  {
-    id: 3,
-    startTime: '2022-07-07 12:00',
-    endTime: '2022-07-08 11:59',
-  },
-  {
-    id: 2,
-    startTime: '2022-07-10 00:00',
-    endTime: '2022-07-12 23:59',
-  },
-  {
-    id: 2,
-    startTime: '2023-07-05 00:00',
-    endTime: '2023-07-05 12:00',
-  },
-]
+const userList = Array.from({ length: 100 }, (_, index) => ({ username: `工${index + 1}号`, id: index + 1 }))
+
+const randomTime = ['12:00', '00:00', '11:59', '23:59']
+
+const timeList = Array.from({ length: 2000 }, (_, index) => {
+  const randIdx1 = ~~(Math.random() * 4)
+  const randIdx2 = ~~(Math.random() * 4)
+  const randIdx3 = ~~(Math.random() * 7) + 1
+  const randIdx4 = ~~(Math.random() * 100) + 1
+  const startTime = getRandomDataBetween('2022-06-24', '2023-06-24')
+  const endTime = getAfterTime(startTime, randIdx3)
+  return {
+    startTime: `${startTime} ${randomTime[randIdx1]}`,
+    endTime: `${endTime} ${randomTime[randIdx2]}`,
+    id: randIdx4,
+  }
+})
 </script>
 
 <template>

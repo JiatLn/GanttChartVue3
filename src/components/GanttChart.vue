@@ -4,7 +4,7 @@ import type { EChartsOption } from 'echarts'
 
 interface UserItem {
   id: number
-  Name: string
+  username: string
 }
 
 interface TimeItem {
@@ -19,7 +19,7 @@ const props = defineProps<{
 }>()
 
 function getNameById(id: number) {
-  return props.userList.find(item => item.id === id)?.Name || ''
+  return props.userList.find(item => item.id === id)?.username || ''
 }
 
 const option = computed<Partial<echarts.EChartsCoreOption>>(() => ({
@@ -89,7 +89,6 @@ const option = computed<Partial<echarts.EChartsCoreOption>>(() => ({
       hideOverlap: false,
       interval: 0,
       formatter(value: string) {
-        // 格式化成月/日，只在第一个刻度显示年份
         const date = new Date(value)
         const year = date.getFullYear()
         const month = date.getMonth() + 1
@@ -99,7 +98,6 @@ const option = computed<Partial<echarts.EChartsCoreOption>>(() => ({
       },
     },
     minInterval: 3600 * 6 * 1000,
-    // max: 3600 * 12 * 1000 * 60,
     maxInterval: 3600 * 13 * 1000,
   },
   yAxis: {
@@ -108,10 +106,10 @@ const option = computed<Partial<echarts.EChartsCoreOption>>(() => ({
     axisLine: { show: true, interval: 1 },
     axisLabel: { show: false },
     min: 0,
-    max: 40, // 总人数
+    max: Math.max(props.userList.length, 40) + 1,
     inverse: true,
-    minInterval: 1,
-    maxInterval: 1,
+    minInterval: 0,
+    maxInterval: 0,
   },
   dataset: [
     {
@@ -119,7 +117,7 @@ const option = computed<Partial<echarts.EChartsCoreOption>>(() => ({
       source: props.timeList,
     },
     {
-      dimensions: ['id', 'Name'],
+      dimensions: ['id', 'username'],
       source: props.userList,
     },
   ],
@@ -132,8 +130,8 @@ const option = computed<Partial<echarts.EChartsCoreOption>>(() => ({
       renderItem: renderGanttItem,
       dimensions: ['id', 'startTime', 'endTime'],
       encode: {
-        x: [1, 2],
-        y: 0,
+        x: ['startTime', 'endTime'],
+        y: 'id',
       },
       tooltip: {
         formatter(params: Record<string, any>) {
@@ -147,10 +145,10 @@ const option = computed<Partial<echarts.EChartsCoreOption>>(() => ({
       type: 'custom',
       datasetIndex: 1,
       renderItem: renderAxisLabelItem,
-      dimensions: [{ name: 'id', type: 'number' }, { name: 'Name', type: 'ordinal' }],
+      dimensions: [{ name: 'id', type: 'number' }, { name: 'username', type: 'ordinal' }],
       encode: {
         x: -1,
-        y: 'Name',
+        y: 'username',
       },
     },
   ],

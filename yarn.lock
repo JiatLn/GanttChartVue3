@@ -1365,6 +1365,11 @@ csstype@^2.6.8:
   resolved "https://registry.npmmirror.com/csstype/-/csstype-2.6.20.tgz#9229c65ea0b260cf4d3d997cb06288e36a8d6dda"
   integrity sha512-/WwNkdXfckNgw6S5R125rrW8ez139lBHWouiBvX8dfMFtcn6V81REDqnH7+CRpRipfYlyU1CmOnOxrmGcFOjeA==
 
+dayjs-random@^1.0.1:
+  version "1.0.1"
+  resolved "https://registry.npmmirror.com/dayjs-random/-/dayjs-random-1.0.1.tgz#d6061a44eaf00937730432373f384185b6c274f2"
+  integrity sha512-J6PL4LRnXgah/FPOXGeeePYShyRH779MzaNYKc70J/7tU0I35F1OBV5alke972zZ70grO9SZpASkhUHyHl/qZA==
+
 dayjs@^1.11.3:
   version "1.11.3"
   resolved "https://registry.npmjs.org/dayjs/-/dayjs-1.11.3.tgz#4754eb694a624057b9ad2224b67b15d552589258"
