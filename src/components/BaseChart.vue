@@ -3,13 +3,13 @@ import * as echarts from 'echarts'
 import { merge, throttle } from 'lodash-es'
 
 const props = defineProps<{
-  option: Partial<echarts.EChartsOption>
+  option: Partial<echarts.EChartsCoreOption>
 }>()
 
 const chart = shallowRef<echarts.EChartsType>()
 const chartEl = ref<HTMLElement>()
 
-const setOption = (option: echarts.EChartsOption) => {
+const setOption = (option: echarts.EChartsCoreOption) => {
   const baseOption = {
     title: {
       top: '4%',

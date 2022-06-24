@@ -2,36 +2,27 @@
 import * as echarts from 'echarts'
 import type { EChartsOption } from 'echarts'
 
-const userList = [{
-  Index: 1,
-  Name: '张三',
-}, {
-  Index: 2,
-  Name: '李四',
-}, {
-  Index: 3,
-  Name: '王五',
-}]
+interface UserItem {
+  id: number
+  Name: string
+}
 
-const timeTableData = [{
-  Index: 1,
-  startTime: '2022-07-04 12:00',
-  endTime: '2022-07-06 23:59',
-}, {
-  Index: 2,
-  startTime: '2022-07-07 00:00',
-  endTime: '2022-07-08 23:59',
-}, {
-  Index: 3,
-  startTime: '2022-07-07 00:00',
-  endTime: '2022-07-08 23:59',
-}, {
-  Index: 2,
-  startTime: '2022-07-10 00:00',
-  endTime: '2022-07-12 23:59',
-}]
+interface TimeItem {
+  id: number
+  startTime: string
+  endTime: string
+}
 
-const option = computed<Partial<EChartsOption & { series: {}[] }>>(() => ({
+const props = defineProps<{
+  userList: UserItem[]
+  timeList: TimeItem[]
+}>()
+
+function getNameById(id: number) {
+  return props.userList.find(item => item.id === id)?.Name || ''
+}
+
+const option = computed<Partial<echarts.EChartsCoreOption>>(() => ({
   tooltip: { },
   animation: false,
   toolbox: { },
@@ -40,14 +31,20 @@ const option = computed<Partial<EChartsOption & { series: {}[] }>>(() => ({
     left: 'center',
   },
   dataZoom: [
+    // X轴
     {
       xAxisIndex: 0,
       start: 0,
-      end: 80,
+      end: 4,
       type: 'slider',
       zoomLock: true,
       brushSelect: false,
+      filterMode: 'weakFilter',
+      labelFormatter: (val: number) => {
+        return new Date(val).toLocaleDateString()
+      },
     },
+    // Y轴
     {
       yAxisIndex: 0,
       startValue: 0,
@@ -56,12 +53,13 @@ const option = computed<Partial<EChartsOption & { series: {}[] }>>(() => ({
       zoomLock: true,
       brushSelect: false,
       rangeMode: ['value', 'value'],
+      showDetail: false,
     },
   ],
   grid: {
     show: true,
-    top: 80,
-    bottom: 80,
+    top: 30,
+    bottom: 40,
     left: 100,
     right: 80,
     backgroundColor: '#fff',
@@ -88,21 +86,21 @@ const option = computed<Partial<EChartsOption & { series: {}[] }>>(() => ({
       color: '#000',
       inside: false,
       align: 'center',
-      hideOverlap: true,
-      interval: 1,
+      hideOverlap: false,
+      interval: 0,
       formatter(value: string) {
         // 格式化成月/日，只在第一个刻度显示年份
         const date = new Date(value)
+        const year = date.getFullYear()
         const month = date.getMonth() + 1
         const day = date.getDate()
-        const hour = date.getHours()
-        return `${month}月${day}日\n${hour}点`
+        const hour = date.getHours() === 0 ? '上午' : '下午'
+        return `${year}年\n${month}月${day}日\n${hour}`
       },
     },
-    // interval: 3600 * 12 * 1000,
-    // minInterval: 3600 * 12 * 1000,
+    minInterval: 3600 * 6 * 1000,
     // max: 3600 * 12 * 1000 * 60,
-    maxInterval: 3600 * 12 * 1000,
+    maxInterval: 3600 * 13 * 1000,
   },
   yAxis: {
     axisTick: { show: true },
@@ -117,12 +115,12 @@ const option = computed<Partial<EChartsOption & { series: {}[] }>>(() => ({
   },
   dataset: [
     {
-      dimensions: ['Index', 'startTime', 'endTime'],
-      source: timeTableData,
+      dimensions: ['id', 'startTime', 'endTime'],
+      source: props.timeList,
     },
     {
-      dimensions: ['Index', 'Name'],
-      source: userList,
+      dimensions: ['id', 'Name'],
+      source: props.userList,
     },
   ],
   series: [
@@ -132,22 +130,27 @@ const option = computed<Partial<EChartsOption & { series: {}[] }>>(() => ({
       type: 'custom',
       datasetIndex: 0,
       renderItem: renderGanttItem,
-      dimensions: ['Index', 'startTime', 'endTime'],
+      dimensions: ['id', 'startTime', 'endTime'],
       encode: {
         x: [1, 2],
         y: 0,
-        tooltip: [0, 1, 2],
+      },
+      tooltip: {
+        formatter(params: Record<string, any>) {
+          const { startTime, endTime, id } = params.data
+          const name = getNameById(id)
+          return `姓名：${name}<br>开始时间：${startTime}<br>结束时间：${endTime}`
+        },
       },
     },
     {
       type: 'custom',
       datasetIndex: 1,
       renderItem: renderAxisLabelItem,
-      dimensions: [{ name: 'Index', type: 'number' }, { name: 'Name', type: 'ordinal' }],
+      dimensions: [{ name: 'id', type: 'number' }, { name: 'Name', type: 'ordinal' }],
       encode: {
         x: -1,
         y: 'Name',
-        tooltip: 1,
       },
     },
   ],
@@ -168,7 +171,7 @@ function renderGanttItem(params: Record<string, any>, api: Record<string, any>) 
     width: barLength,
     height: barHeight,
   })
-  const showText = `${userList.find(item => item.Index === api.value())?.Name} ${timeTableData.find(item => item.Index === api.value())?.startTime}-${timeTableData.find(item => item.Index === api.value())?.endTime}`
+  const showText = getNameById(api.value())
   return {
     type: 'group',
     children: [
@@ -202,7 +205,7 @@ function renderAxisLabelItem(params: Record<string, any>, api: Record<string, an
         style: {
           x: 0,
           y: 0,
-          text: userList.find(item => item.Index === api.value())?.Name,
+          text: getNameById(api.value()),
           textVerticalAlign: 'center',
           textAlign: 'center',
           textFill: '#000',
