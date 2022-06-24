@@ -18,7 +18,7 @@ export const getRandomDataBetween = (startDate: string | Date, endDate: string |
   return dayjs.between(startDate, endDate).format('YYYY-MM-DD')
 }
 
-export const getAfterTime = (date: Date, delta: number) => {
+export const getAfterTime = (date: Date | string, delta: number) => {
   return dayjs(new Date(date)).add(delta, 'day').format('YYYY-MM-DD')
 }
 
